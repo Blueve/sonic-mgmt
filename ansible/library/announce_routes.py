@@ -1708,7 +1708,8 @@ def main():
             peers_routes_to_change=dict(required=False, type='dict', default={}),
             log_path=dict(required=False, type='str', default='/tmp'),
             upstream_neighbor_groups=dict(required=False, type='int', default=0),
-            downstream_neighbor_groups=dict(required=False, type='int', default=0)
+            downstream_neighbor_groups=dict(required=False, type='int', default=0),
+            return_routes=dict(required=False, type='bool', default=False)
         ),
         supports_check_mode=False)
 
@@ -1724,6 +1725,7 @@ def main():
     peers_routes_to_change = module.params['peers_routes_to_change']
     upstream_neighbor_groups = module.params['upstream_neighbor_groups']
     downstream_neighbor_groups = module.params['downstream_neighbor_groups']
+    return_routes = module.params['return_routes']
 
     topo = read_topo(topo_name, path)
     if not topo:
@@ -1746,40 +1748,51 @@ def main():
         elif topo_type == "t0":
             fib_t0(topo, ptf_ip, no_default_route=is_storage_backend, action=action,
                    upstream_neighbor_groups=upstream_neighbor_groups, topo_routes=topo_routes)
-            module.exit_json(changed=True, topo_routes=convert_routes_to_str(topo_routes))
+            module.exit_json(changed=True,
+                             topo_routes=convert_routes_to_str(topo_routes) if return_routes else {})
         elif topo_type == "t1" or topo_type == "smartswitch-t1":
             fib_t1_lag(
                 topo, ptf_ip, topo_name, no_default_route=is_storage_backend, action=action,
                 tor_default_route=tor_default_route, downstream_neighbor_groups=downstream_neighbor_groups,
                 topo_routes=topo_routes)
-            module.exit_json(changed=True, topo_routes=convert_routes_to_str(topo_routes))
+            module.exit_json(changed=True,
+                             topo_routes=convert_routes_to_str(topo_routes) if return_routes else {})
         elif topo_type == "t2":
             fib_t2_lag(topo, ptf_ip, action=action, topo_routes=topo_routes)
-            module.exit_json(changed=True, topo_routes=convert_routes_to_str(topo_routes))
+            module.exit_json(changed=True,
+                             topo_routes=convert_routes_to_str(topo_routes) if return_routes else {})
         elif topo_type == "t0-mclag":
             fib_t0_mclag(topo, ptf_ip, action=action, topo_routes=topo_routes)
-            module.exit_json(changed=True, topo_routes=convert_routes_to_str(topo_routes))
+            module.exit_json(changed=True,
+                             topo_routes=convert_routes_to_str(topo_routes) if return_routes else {})
         elif topo_type == "m1":
             fib_m1(topo, ptf_ip, action=action, topo_routes=topo_routes)
-            module.exit_json(changed=True, topo_routes=convert_routes_to_str(topo_routes))
+            module.exit_json(changed=True,
+                             topo_routes=convert_routes_to_str(topo_routes) if return_routes else {})
         elif topo_type == "m0":
             fib_m0(topo, ptf_ip, action=action, topo_routes=topo_routes)
-            module.exit_json(changed=True, topo_routes=convert_routes_to_str(topo_routes))
+            module.exit_json(changed=True,
+                             topo_routes=convert_routes_to_str(topo_routes) if return_routes else {})
         elif topo_type == "mx":
             fib_mx(topo, ptf_ip, action=action, topo_routes=topo_routes)
-            module.exit_json(changed=True, topo_routes=convert_routes_to_str(topo_routes))
+            module.exit_json(changed=True,
+                             topo_routes=convert_routes_to_str(topo_routes) if return_routes else {})
         elif topo_type == "c0":
             fib_c0(topo, ptf_ip, action=action, topo_routes=topo_routes)
-            module.exit_json(changed=True, topo_routes=convert_routes_to_str(topo_routes))
+            module.exit_json(changed=True,
+                             topo_routes=convert_routes_to_str(topo_routes) if return_routes else {})
         elif topo_type == "dpu":
             fib_dpu(topo, ptf_ip, action=action, topo_routes=topo_routes)
-            module.exit_json(change=True, topo_routes=convert_routes_to_str(topo_routes))
+            module.exit_json(change=True,
+                             topo_routes=convert_routes_to_str(topo_routes) if return_routes else {})
         elif topo_type == "lt2":
             fib_lt2_routes(topo, ptf_ip, action=action, topo_routes=topo_routes)
-            module.exit_json(change=True, topo_routes=convert_routes_to_str(topo_routes))
+            module.exit_json(change=True,
+                             topo_routes=convert_routes_to_str(topo_routes) if return_routes else {})
         elif topo_type == "ft2":
             fib_ft2_routes(topo, ptf_ip, action=action, topo_routes=topo_routes)
-            module.exit_json(change=True, topo_routes=convert_routes_to_str(topo_routes))
+            module.exit_json(change=True,
+                             topo_routes=convert_routes_to_str(topo_routes) if return_routes else {})
         else:
             module.exit_json(
                 msg='Unsupported topology "{}" - skipping announcing routes'.format(topo_name))
